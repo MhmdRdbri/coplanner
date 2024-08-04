@@ -1,0 +1,1 @@
+web: gunicorn coplanner.wsgi --log-file -

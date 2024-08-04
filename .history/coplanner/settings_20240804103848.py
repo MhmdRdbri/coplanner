@@ -18,6 +18,10 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+django_heroku.settings(locals())
+
+
+# Application definition
 
 INSTALLED_APPS = [
     'jazzmin',
