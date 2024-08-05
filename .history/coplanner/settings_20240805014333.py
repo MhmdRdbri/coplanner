@@ -42,7 +42,6 @@ INSTALLED_APPS = [
     'django_celery_beat',
     'django_celery_results',
     'telegram_bot',
-    'channels',
 ]
 
 MIDDLEWARE = [
@@ -353,5 +352,3 @@ sentry_sdk.init(
     # We recommend adjusting this value in production.
     profiles_sample_rate=1.0,
 )
-
-# ASGI_APPLICATION = 'coplanner.asgi.application'

@@ -354,4 +354,4 @@ sentry_sdk.init(
     profiles_sample_rate=1.0,
 )
 
-# ASGI_APPLICATION = 'coplanner.asgi.application'
+ASGI_APPLICATION = 'coplanner.asgi.application'
