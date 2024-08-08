@@ -356,4 +356,4 @@ sentry_sdk.init(
 
 # ASGI_APPLICATION = 'coplanner.asgi.application'
 
-TELEGRAM_BOT_TOKEN = '7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk'
+TELEGRAM_BOT_TOKEN = 'YOUR_BOT_TOKEN_HERE'

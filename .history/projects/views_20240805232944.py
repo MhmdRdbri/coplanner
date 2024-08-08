@@ -5,25 +5,35 @@ from .models import Project
 from .serializers import ProjectSerializer
 from account.permissions import HasSpecialAccessPermission
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from telegram import Bot
 
 
-@extend_schema_view(
-    list=extend_schema(
-        description="List all projects or viewable projects based on user permissions.",
-    ),
-    retrieve=extend_schema(
-        description="Retrieve a project by ID. Only accessible by special access users and admins.",
-    ),
-    create=extend_schema(
-        description="Create a new project. Only accessible by admins.",
-    ),
-    update=extend_schema(
-        description="Update a project. Admins can update any project. Responsible persons can update their projects if not completed.",
-    ),
-    destroy=extend_schema(
-        description="Delete a project. Only accessible by admins.",
-    ),
-)
+# @extend_schema_view(
+#     list=extend_schema(
+#         description="List all projects or viewable projects based on user permissions.",
+#     ),
+#     retrieve=extend_schema(
+#         description="Retrieve a project by ID. Only accessible by special access users and admins.",
+#     ),
+#     create=extend_schema(
+#         description="Create a new project. Only accessible by admins.",
+#     ),
+#     update=extend_schema(
+#         description="Update a project. Admins can update any project. Responsible persons can update their projects if not completed.",
+#     ),
+#     destroy=extend_schema(
+#         description="Delete a project. Only accessible by admins.",
+#     ),
+# )
+
+def send_telegram_message(chat_id, text):
+    bot_token = 'YOUR_BOT_TOKEN_HERE'  # Replace with your actual bot token
+    bot = Bot(token=bot_token)
+    try:
+        bot.send_message(chat_id=chat_id, text=text)
+        print(f"Message sent to chat_id {chat_id}: {text}")
+    except Exception as e:
+        print(f"An error occurred: {e}")
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
@@ -48,9 +58,18 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def create(self, request):
         if not request.user.is_staff:
             return Response({"error": "You do not have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            project = serializer.save()
+            
+            # Send notification to the responsible person
+            if project.responsible_person:
+                chat_id = project.responsible_person.telegram_chat_id
+                if chat_id:
+                    message = f"New project created: {project.name}"
+                    send_telegram_message(chat_id, message)
+            
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

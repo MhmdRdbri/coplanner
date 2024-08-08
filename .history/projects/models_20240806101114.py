@@ -3,10 +3,6 @@ from account.models import CustomUser
 from django_jalali.db import models as jmodels
 import http.client
 import json
-from telegram import Bot
-from django.conf import settings  # Ensure you have your settings configured properly
-import logging
-import asyncio
 
 
 class SMSLog(models.Model):
@@ -64,29 +60,10 @@ class Project(models.Model):
 
     def save(self, *args, **kwargs):
         super().save(*args, **kwargs)
-        if self.responsible_person :
-            status = 'none'
-            result = ''
-            try:
-
-                chat_id = self.responsible_person.telegram_chat_id  # Ensure this field is correctly set in your CustomUser model
-                bot_token = '7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk' # Store your bot token in Django settings
-                bot = Bot(token=bot_token)
-                message = f" پروژه تازه ای به نام '{self.name}' برای شما ایجاد شده است"
-                
-                logging.debug(f"Attempting to send message to chat_id: {chat_id}")
-                
-                # Synchronously send the message
-                asyncio.run(bot.send_message(chat_id=chat_id, text=message))
-                logging.info(f"Sent message to {chat_id}: {message}")
-
-
-            except Exception as e:
-                logging.error(f"Failed to send Telegram message: {e}")
-
-
-
-
+        # if self.responsible_person :
+        #     status = 'none'
+        #     result = ''
+        #     try:
         #         conn = http.client.HTTPSConnection("api2.ippanel.com")
         #         payload = json.dumps({
         #             "code": "grsavr8kfgqazyn",

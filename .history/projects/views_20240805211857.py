@@ -5,6 +5,8 @@ from .models import Project
 from .serializers import ProjectSerializer
 from account.permissions import HasSpecialAccessPermission
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from telegram import Bot
+
 
 
 @extend_schema_view(
@@ -24,6 +26,10 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
         description="Delete a project. Only accessible by admins.",
     ),
 )
+
+def send_telegram_message(chat_id, text):
+    bot = Bot(token='7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk')
+    bot.send_message(chat_id=chat_id, text=text)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()

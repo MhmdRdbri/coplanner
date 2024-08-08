@@ -24,7 +24,6 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
         description="Delete a project. Only accessible by admins.",
     ),
 )
-
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer

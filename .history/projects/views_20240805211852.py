@@ -25,6 +25,10 @@ from drf_spectacular.utils import extend_schema, extend_schema_view
     ),
 )
 
+def send_telegram_message(chat_id, text):
+    bot = Bot(token='7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk')
+    bot.send_message(chat_id=chat_id, text=text)
+
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer

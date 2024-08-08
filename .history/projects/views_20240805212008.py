@@ -5,25 +5,30 @@ from .models import Project
 from .serializers import ProjectSerializer
 from account.permissions import HasSpecialAccessPermission
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from telegram import Bot
 
 
-@extend_schema_view(
-    list=extend_schema(
-        description="List all projects or viewable projects based on user permissions.",
-    ),
-    retrieve=extend_schema(
-        description="Retrieve a project by ID. Only accessible by special access users and admins.",
-    ),
-    create=extend_schema(
-        description="Create a new project. Only accessible by admins.",
-    ),
-    update=extend_schema(
-        description="Update a project. Admins can update any project. Responsible persons can update their projects if not completed.",
-    ),
-    destroy=extend_schema(
-        description="Delete a project. Only accessible by admins.",
-    ),
-)
+# @extend_schema_view(
+#     list=extend_schema(
+#         description="List all projects or viewable projects based on user permissions.",
+#     ),
+#     retrieve=extend_schema(
+#         description="Retrieve a project by ID. Only accessible by special access users and admins.",
+#     ),
+#     create=extend_schema(
+#         description="Create a new project. Only accessible by admins.",
+#     ),
+#     update=extend_schema(
+#         description="Update a project. Admins can update any project. Responsible persons can update their projects if not completed.",
+#     ),
+#     destroy=extend_schema(
+#         description="Delete a project. Only accessible by admins.",
+#     ),
+# )
+
+def send_telegram_message(chat_id, text):
+    bot = Bot(token='7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk')
+    bot.send_message(chat_id=chat_id, text=text)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
@@ -51,6 +56,14 @@ class ProjectViewSet(viewsets.ModelViewSet):
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
             serializer.save()
+
+            if project.responsible_person:
+                chat_id = project.responsible_person.telegram_chat_id
+                if chat_id:
+                    # Send a notification to the user via Telegram
+                    message = f"New project created: {project.name}"
+                    send_telegram_message(chat_id, message)
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

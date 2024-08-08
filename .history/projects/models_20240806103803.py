@@ -72,7 +72,7 @@ class Project(models.Model):
                 chat_id = self.responsible_person.telegram_chat_id  # Ensure this field is correctly set in your CustomUser model
                 bot_token = '7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk' # Store your bot token in Django settings
                 bot = Bot(token=bot_token)
-                message = f" پروژه تازه ای به نام '{self.name}' برای شما ایجاد شده است"
+                message = f"Project '{self.name}' has been created."
                 
                 logging.debug(f"Attempting to send message to chat_id: {chat_id}")
                 

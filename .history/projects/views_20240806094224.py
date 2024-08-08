@@ -5,25 +5,32 @@ from .models import Project
 from .serializers import ProjectSerializer
 from account.permissions import HasSpecialAccessPermission
 from drf_spectacular.utils import extend_schema, extend_schema_view
+from telegram import Bot
+from django.conf import settings
+import asyncio
 
 
-@extend_schema_view(
-    list=extend_schema(
-        description="List all projects or viewable projects based on user permissions.",
-    ),
-    retrieve=extend_schema(
-        description="Retrieve a project by ID. Only accessible by special access users and admins.",
-    ),
-    create=extend_schema(
-        description="Create a new project. Only accessible by admins.",
-    ),
-    update=extend_schema(
-        description="Update a project. Admins can update any project. Responsible persons can update their projects if not completed.",
-    ),
-    destroy=extend_schema(
-        description="Delete a project. Only accessible by admins.",
-    ),
-)
+# @extend_schema_view(
+#     list=extend_schema(
+#         description="List all projects or viewable projects based on user permissions.",
+#     ),
+#     retrieve=extend_schema(
+#         description="Retrieve a project by ID. Only accessible by special access users and admins.",
+#     ),
+#     create=extend_schema(
+#         description="Create a new project. Only accessible by admins.",
+#     ),
+#     update=extend_schema(
+#         description="Update a project. Admins can update any project. Responsible persons can update their projects if not completed.",
+#     ),
+#     destroy=extend_schema(
+#         description="Delete a project. Only accessible by admins.",
+#     ),
+# )
+
+def send_telegram_message(chat_id, text):
+    bot = Bot(token='7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk')
+    bot.send_message(chat_id=chat_id, text=text)
 
 class ProjectViewSet(viewsets.ModelViewSet):
     queryset = Project.objects.all()
@@ -48,11 +55,26 @@ class ProjectViewSet(viewsets.ModelViewSet):
     def create(self, request):
         if not request.user.is_staff:
             return Response({"error": "You do not have permission to perform this action."}, status=status.HTTP_403_FORBIDDEN)
+        
         serializer = self.serializer_class(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            project = serializer.save()
+
+            try:
+                chat_id = request.user.telegram_chat_id
+                bot_token = '7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk'
+                bot = Bot(token=bot_token)
+                message = f"Project '{project.name}' has been created."
+
+                async_to_sync(bot.send_message)(chat_id=chat_id, text=message)
+                logging.info(f"Sent message to {chat_id}: {message}")
+            except Exception as e:
+                logging.error(f"Failed to send Telegram message: {e}")
+
             return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
     def update(self, request, pk=None):
         project = get_object_or_404(Project, pk=pk)
