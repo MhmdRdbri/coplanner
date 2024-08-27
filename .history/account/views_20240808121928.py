@@ -19,7 +19,6 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.exceptions import TokenError
 import logging
 import asyncio
-from telegram import Bot
 
 
 class CustomUserLoginAPIView(APIView):
@@ -51,46 +50,32 @@ class PasswordResetInitiateAPIView(APIView):
 
             try:
                 user = CustomUser.objects.get(phone_number=phone_number)
-                token = PasswordResetToken.create_code(user)
-                
-                chat_id = user.telegram_chat_id
-                bot_token = '7052281105:AAG5x1yux4ryfDzvfAmn1mwuVqa4LmBtKkk'
-                bot = Bot(token=bot_token)
-                message = f"کد یکبار مصرف شما برای تغییر رمز '{token.token}' است"
-                
-                logging.debug(f"Attempting to send message to chat_id: {chat_id}")
-
-                asyncio.run(bot.send_message(chat_id=chat_id, text=message))
-                logging.info(f"Sent message to {chat_id}: {message}")
-
-                return Response({'message': 'Verification code sent successfully'}, status=status.HTTP_200_OK)
-
             except CustomUser.DoesNotExist:
                 return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
 
-            
+            token = PasswordResetToken.create_code(user)
 
             print(token.token)
 
-            # conn = http.client.HTTPSConnection("api2.ippanel.com")
-            # payload = json.dumps({
-            # "code": "se2e1hipxk5amv4",
-            # "sender": "+983000505",
-            # "recipient": phone_number,
-            # "variable": {
-            #     "verification-code": token.token,
-            # }
-            # })
-            # headers = {
-            # 'apikey': ' SZtX_MYwI2E0jWqdkrSoDV3-02u0yF-l2c1LXgZVZpw= ',
-            # 'Content-Type': 'application/json'
-            # }
-            # conn.request("POST", "/api/v1/sms/pattern/normal/send", payload, headers)
-            # res = conn.getresponse()
-            # data = res.read()
-            # print(data.decode("utf-8"))
-            
-            
+            conn = http.client.HTTPSConnection("api2.ippanel.com")
+            payload = json.dumps({
+            "code": "se2e1hipxk5amv4",
+            "sender": "+983000505",
+            "recipient": phone_number,
+            "variable": {
+                "verification-code": token.token,
+            }
+            })
+            headers = {
+            'apikey': ' SZtX_MYwI2E0jWqdkrSoDV3-02u0yF-l2c1LXgZVZpw= ',
+            'Content-Type': 'application/json'
+            }
+            conn.request("POST", "/api/v1/sms/pattern/normal/send", payload, headers)
+            res = conn.getresponse()
+            data = res.read()
+            print(data.decode("utf-8"))
+
+            return Response({'message': 'Verification code sent successfully'}, status=status.HTTP_200_OK)
         else:
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 

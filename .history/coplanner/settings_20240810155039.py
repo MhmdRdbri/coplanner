@@ -7,8 +7,7 @@ import os
 
 env = environ.Env(
     # set casting, default value
-    DEBUG=(bool, False),
-    SECRET_KEY=(str,'ad')
+    DEBUG=(bool, False)
 )
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.

@@ -3,30 +3,22 @@ from datetime import timedelta
 import sentry_sdk
 import django_heroku
 import environ
-import os   
-
-env = environ.Env(
-    # set casting, default value
-    DEBUG=(bool, False),
-    SECRET_KEY=(str,'ad')
-)
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-
-SECRET_KEY = env('SECRET_KEY')
+SECRET_KEY = 'django-insecure-mz!b*803j!54)o2swmyn6_s62folgz3mf3!$b2(#!cj7oe$j81'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = env('DEBUG')
+DEBUG = True
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['fb5a-79-127-241-55.ngrok-free.app', '127.0.0.1']
 
 
 INSTALLED_APPS = [
