@@ -1,0 +1,31 @@
+# myapp/admin.py
+
+from django.contrib import admin
+from .models import Task
+
+@admin.register(Task)
+class TaskAdmin(admin.ModelAdmin):
+    list_display = ['title', 'user', 'due_date', 'is_done', 'created_at']
+    list_filter = ['due_date', 'user', 'is_done']
+    search_fields = ['title', 'user__phone_number']
+    actions = ['mark_as_done', 'mark_as_not_done']
+
+    def get_actions(self, request):
+        actions = super().get_actions(request)
+        if 'delete_selected' in actions:
+            del actions['delete_selected']
+        return actions
+
+    def mark_as_done(self, request, queryset):
+        queryset.update(is_done=True)
+        for task in queryset:
+            task.subtasks.update(is_done=True)
+            task.save()
+    mark_as_done.short_description = "Mark selected tasks as done"
+
+    def mark_as_not_done(self, request, queryset):
+        queryset.update(is_done=False)
+        for task in queryset:
+            task.subtasks.update(is_done=False)
+            task.save()
+    mark_as_not_done.short_description = "Mark selected tasks as not done"
