@@ -6,13 +6,19 @@ from .serializers import TaskSerializer
 from django.db import models
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import action
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
+from account.permissions import HasSpecialAccessPermission
 
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasSpecialAccessPermission]
 
     def get_queryset(self):
         user = self.request.user
+        if user.is_staff or user.has_special_access:
+            return Task.objects.all()
         return Task.objects.filter(models.Q(sender=user) | models.Q(receiver=user))
 
     def update(self, request, *args, **kwargs):

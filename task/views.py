@@ -16,6 +16,8 @@ class TaskViewSet(viewsets.ModelViewSet):
 
     def get_queryset(self):
         user = self.request.user
+        if user.is_staff or user.has_special_access:
+            return Task.objects.all()
         return Task.objects.filter(models.Q(sender=user) | models.Q(receiver=user))
 
     def update(self, request, *args, **kwargs):

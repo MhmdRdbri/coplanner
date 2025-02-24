@@ -3,11 +3,16 @@ from rest_framework.response import Response
 from rest_framework import status as drf_status
 from .models import Task
 from .serializers import TaskSerializer
-from django.db import models  # Add this line
+from django.db import models
+from django.shortcuts import get_object_or_404
+from rest_framework.decorators import action
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework import status
 
 class TaskViewSet(viewsets.ModelViewSet):
     serializer_class = TaskSerializer
-    permission_classes = [permissions.IsAuthenticated]
+    permission_classes = [HasSpecialAccessPermission]
 
     def get_queryset(self):
         user = self.request.user
