@@ -11,7 +11,6 @@ Coplanner is a web-based project management application designed to enhance team
 - [Usage](#usage)
 - [Contributing](#contributing)
 - [License](#license)
-- [Contact](#contact)
 
 ### Features
 
